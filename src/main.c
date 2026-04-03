@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
   }
 
   int x = getToken(fp);
-  
-  printf("\n");
+
+  printf("%c -- %d\n", x, x);
   fclose(fp);
 }

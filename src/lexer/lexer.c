@@ -35,32 +35,34 @@ enum Token matchToken() {
 }
 
 enum Token getToken(FILE* fp) {
-  static char lastChar = ' ';
+  char lastChar = ' ';
   while(isspace(lastChar)) {
     lastChar = fgetc(fp);
   }
 
   if(isalpha(lastChar)) {
-    identifierStr[0] = lastChar;
+    identifierStr[identifierLen] += lastChar;
+    identifierLen++;
 
     while(isalnum(lastChar = fgetc(fp))) {
-      identifierStr += lastChar;     
+      identifierStr[identifierLen] += lastChar;
+      identifierLen++;
     }
-
+  
     return matchToken();
   }
 
   // check for numbers
   // TODO: handle errors such as 127.3.1.0
   if(isdigit(lastChar) || lastChar == '.') {
-    char* num;
+    char* num = NULL;
 
     do {
       num += lastChar;
       lastChar = fgetc(fp);
     } while(isdigit(lastChar) || lastChar == '.');
 
-    numberVal = strtod(num, 0);
+    numberVal = strtold(num, NULL);
     return number;
   }
 
