@@ -34,11 +34,12 @@ typedef struct FUNC_AST {
 
 int currentToken;
 
-inline int getNextToken(FILE* fp) {
-  return currentToken = getToken(fp);
+int getNextToken(FILE* fp) {
+  currentToken = getToken(fp);
+  return currentToken;
 }
 
-#define LOG_ERROR(str) fprintf(stderr, "Error: %s\n", str)
+#define LOG_ERROR(str) fprintf(stderr, "error: %s\n", str)
 
 #define AST_H
 #endif
