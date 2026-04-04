@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "lexer/lexer.h"
+#include "lexer.h"
 
 int main(int argc, char** argv) {
   if(argc < 2) {
@@ -13,8 +13,11 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  int x = getToken(fp);
+  int x = 0;
 
-  printf("%c -- %d\n", x, x);
+  while((x = getToken(fp)) && x != eof) {
+    printf("%c -- %d\n", x, x);
+  }
+  
   fclose(fp);
 }
