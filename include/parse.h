@@ -1,5 +1,7 @@
 #ifndef PARSE_H
-#include "ast.h"
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 typedef struct BINOPSMAP {
   char key;

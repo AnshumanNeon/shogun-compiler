@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "parse.h"
+#include "lexer.h"
 
 int main(int argc, char** argv) {
   if(argc < 2) {

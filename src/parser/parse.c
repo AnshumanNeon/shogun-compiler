@@ -1,6 +1,5 @@
 #include "parse.h"
-#include <ctype.h>
-#include <stdlib.h>
+#include "ast.h"
 
 void initPrecedence() {
   precedenceTable[0] = (BinOpsMap){ .key = '<', .precedence = 10 };
