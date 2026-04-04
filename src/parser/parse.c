@@ -114,3 +114,53 @@ void* parseBinOpsRHS(FILE* fp, int exprPrecedence, void* lhs) {
     lhs = x;
   }
 }
+
+void* parsePrototype(FILE* fp) {
+  if(currentToken != identifier) LOG_ERROR("expected function name in prototype");
+
+  ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
+  p->name = identifierStr;
+
+  getNextToken(fp);
+  if(currentToken != '(') LOG_ERROR("expected '(' in prototype");
+
+  while(getNextToken(fp) == identifier) {
+    p->args[p->argLen] = identifierStr;
+    p->argLen++;
+  }
+
+  if(currentToken != ')') LOG_ERROR("expected ')' in prototype");
+  getNextToken(fp);
+
+  return (void*)p;
+}
+
+void* parseDefinition(FILE* fp) {
+  getNextToken(fp);
+  void* p = parsePrototype(fp);
+  if(!p) return NULL;
+
+  void* e = parseExpr(fp);
+  if(e) {
+    FuncAST* f = (FuncAST*)malloc(sizeof(FuncAST));
+    f->prot = (ProtAST*)p;
+    f->body = e;
+    return (void*)f;
+  }
+
+  return NULL;
+}
+
+void* parseTopLevelExpr(FILE* fp) {
+  void* e = parseExpr(fp);
+  if(e) {
+    ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
+    p->name = "__anon_expr";
+    FuncAST* f = (FuncAST*)malloc(sizeof(FuncAST));
+    f->prot = (ProtAST*)p;
+    f->body = e;
+    return (void*)f;
+  }
+
+  return NULL;
+}

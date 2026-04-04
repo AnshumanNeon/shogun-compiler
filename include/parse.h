@@ -16,6 +16,9 @@ void* parseIdentifierExpr(FILE* fp);
 void* parseExpr(FILE* fp);
 void* parse(FILE* fp);
 void* parseBinOpsRHS(FILE* fp, int exprPrecedence, void* lhs);
+void* parsePrototype(FILE* fp);
+void* parseDefinition(FILE* fp);
+void* parseTopLevelExpr(FILE* fp);
 
 #define PARSE_H
 #endif

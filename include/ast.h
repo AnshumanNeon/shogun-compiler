@@ -25,6 +25,7 @@ typedef struct CALL_EXPR_AST {
 typedef struct PROTOTYPE_AST {
   char* name;
   char** args; // list of arguments, each arg is a char* string
+  unsigned int argLen;
 } ProtAST;
 
 typedef struct FUNC_AST {
