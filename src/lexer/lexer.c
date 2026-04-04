@@ -4,6 +4,8 @@
 #include <string.h>
 
 enum Token matchToken() {
+  if(0 == strcmp(identifierStr, "const")) return keyword;
+  if(0 == strcmp(identifierStr, "var")) return keyword;
   if(0 == strcmp(identifierStr, "int")) return keyword;
   if(0 == strcmp(identifierStr, "int8")) return keyword;
   if(0 == strcmp(identifierStr, "int16")) return keyword;
@@ -48,6 +50,8 @@ enum Token getToken(FILE* fp) {
       identifierStr[identifierLen] += lastChar;
       identifierLen++;
     }
+
+    if(0 == strcmp(identifierStr, "fn")) return fn;
   
     return matchToken();
   }
@@ -62,7 +66,7 @@ enum Token getToken(FILE* fp) {
       lastChar = fgetc(fp);
     } while(isdigit(lastChar) || lastChar == '.');
 
-    numberVal = strtold(num, NULL);
+    numberVal = strtold(num, 0);
     return number;
   }
 

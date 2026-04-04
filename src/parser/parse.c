@@ -163,3 +163,45 @@ void* parseTopLevelExpr(FILE* fp) {
 
   return NULL;
 }
+
+void handleTPE(FILE* fp) {
+  void* x = parseTopLevelExpr(fp);
+  if(x) {
+    fprintf(stderr, "top\n");
+    free(x);
+  } else {
+    getNextToken(fp);
+  }
+}
+
+void handleDef(FILE* fp) {
+  void* x= parseDefinition(fp);
+  if(x) {
+    fprintf(stderr, "function\n");
+    free(x);
+  } else {
+    getNextToken(fp);
+  }
+}
+
+// just for testing
+void loop(FILE* fp) {
+  getNextToken(fp);
+
+  while(1) {
+    switch(currentToken) {
+    case eof: return;
+    case ';': {
+      getNextToken(fp);
+      break;
+    }
+    case fn: {
+      handleDef(fp);
+      break;
+    }
+    default: {
+      handleTPE(fp);
+    }
+    }
+  }
+}

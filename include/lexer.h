@@ -1,7 +1,8 @@
 #include <stdio.h>
 
 enum Token {
-  eof, identifier, number, keyword
+  eof, identifier, number, keyword,
+  fn
 };
 
 char identifierStr[44];

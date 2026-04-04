@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "parse.h"
-#include "lexer.h"
 
 int main(int argc, char** argv) {
   if(argc < 2) {
@@ -14,11 +13,9 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  int x = 0;
+  initPrecedence();
 
-  while((x = getToken(fp)) && x != eof) {
-    printf("%c -- %d\n", x, x);
-  }
+  loop(fp);
   
   fclose(fp);
 }
