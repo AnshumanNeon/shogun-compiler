@@ -123,6 +123,7 @@ void* parsePrototype(FILE* fp) {
   p->name = identifierStr;
 
   getNextToken(fp);
+
   if(currentToken != '(') LOG_ERROR("expected '(' in prototype");
 
   while(getNextToken(fp) == identifier) {

@@ -4,17 +4,6 @@
 #include <string.h>
 
 enum Token matchToken() {
-  if(0 == strcmp(identifierStr, "int")) return keyword;
-  if(0 == strcmp(identifierStr, "int8")) return keyword;
-  if(0 == strcmp(identifierStr, "int16")) return keyword;
-  if(0 == strcmp(identifierStr, "int32")) return keyword;
-  if(0 == strcmp(identifierStr, "int64")) return keyword;
-  if(0 == strcmp(identifierStr, "int128")) return keyword;
-  if(0 == strcmp(identifierStr, "float")) return keyword;
-  if(0 == strcmp(identifierStr, "float16")) return keyword;
-  if(0 == strcmp(identifierStr, "float32")) return keyword;
-  if(0 == strcmp(identifierStr, "float64")) return keyword;
-  if(0 == strcmp(identifierStr, "float128")) return keyword;
   if(0 == strcmp(identifierStr, "str")) return keyword;
   if(0 == strcmp(identifierStr, "char")) return keyword;
   if(0 == strcmp(identifierStr, "ptr")) return keyword;
@@ -23,7 +12,6 @@ enum Token matchToken() {
   if(0 == strcmp(identifierStr, "false")) return keyword;
   if(0 == strcmp(identifierStr, "arr")) return keyword;
   if(0 == strcmp(identifierStr, "tup")) return keyword;
-  if(0 == strcmp(identifierStr, "fn")) return keyword;
   if(0 == strcmp(identifierStr, "return")) return keyword;
   if(0 == strcmp(identifierStr, "if")) return keyword;
   if(0 == strcmp(identifierStr, "else")) return keyword;
@@ -32,8 +20,42 @@ enum Token matchToken() {
   else return identifier;
 }
 
+int isNum() {
+  if(0 == strcmp(identifierStr, "int")) return 1;
+  if(0 == strcmp(identifierStr, "int8")) return 1;
+  if(0 == strcmp(identifierStr, "int16")) return 1;
+  if(0 == strcmp(identifierStr, "int32")) return 1;
+  if(0 == strcmp(identifierStr, "int64")) return 1;
+  if(0 == strcmp(identifierStr, "int128")) return 1;
+  if(0 == strcmp(identifierStr, "float")) return 1;
+  if(0 == strcmp(identifierStr, "float16")) return 1;
+  if(0 == strcmp(identifierStr, "float32")) return 1;
+  if(0 == strcmp(identifierStr, "float64")) return 1;
+  if(0 == strcmp(identifierStr, "float128")) return 1;
+
+  return 0;
+}
+
+void nextWord(char* lastChar, FILE* fp) {
+  identifierLen = 0;
+  strcpy(identifierStr, " ");
+
+  while(isspace(*lastChar = fgetc(fp))) {
+    //
+  }
+      
+  identifierStr[identifierLen] = *lastChar;
+  identifierLen++;
+
+  while(isalnum(*lastChar = fgetc(fp))) {
+    identifierStr[identifierLen] = *lastChar;
+    identifierLen++;
+  }
+}
+
 enum Token getToken(FILE* fp) {
   char lastChar = ' ';
+
   while(isspace(lastChar)) {
     lastChar = fgetc(fp);
   }
@@ -42,30 +64,25 @@ enum Token getToken(FILE* fp) {
     identifierStr[identifierLen] = lastChar;
     identifierLen++;
 
-    while(isalnum(lastChar = fgetc(fp))) {
+    while(isalpha(lastChar = fgetc(fp))) {
       identifierStr[identifierLen] = lastChar;
       identifierLen++;
     }
 
     if(0 == strcmp(identifierStr, "var") || (0 == strcmp(identifierStr, "const"))) {
-      identifierLen = 0;
-      strcpy(identifierStr, " ");
+      nextWord(&lastChar, fp);
 
-      while(isspace(lastChar)) {
-	lastChar = fgetc(fp);
+      if(isNum()) {
+	nextWord(&lastChar, fp);
+	printf("%s", identifierStr);
       }
-      identifierStr[identifierLen] = lastChar;
-      identifierLen++;
-
-      while(isalnum(lastChar = fgetc(fp))) {
-	identifierStr[identifierLen] = lastChar;
-	identifierLen++;
-      }
-
-      printf("%s\n", identifierStr);
     }
     
-    if(0 == strcmp(identifierStr, "fn")) return fn;
+    if(0 == strcmp(identifierStr, "fn")) {
+      identifierLen = 0;
+      strcpy(identifierStr, " ");
+      return fn;
+    }
 
     return matchToken();
   }
