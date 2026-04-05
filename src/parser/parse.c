@@ -1,5 +1,6 @@
 #include "parse.h"
 #include "ast.h"
+#include <string.h>
 
 void initPrecedence() {
   precedenceTable[0] = (BinOpsMap){ .key = '<', .precedence = 10 };
@@ -57,7 +58,7 @@ void* parseIdentifierExpr(FILE* fp) {
   c->callee = identifierStr;
   if(currentToken != '(') {
     while(1) {
-      c->args[c->numArgs] = parseExpr(fp);
+      strcpy(c->args[c->numArgs], parseExpr(fp));
       c->numArgs++;
       
       if(currentToken == ')') break;
@@ -118,13 +119,14 @@ void* parsePrototype(FILE* fp) {
   if(currentToken != identifier) LOG_ERROR("expected function name in prototype");
 
   ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
+  p->args = (char**)malloc(sizeof(char*)*128);
   p->name = identifierStr;
 
   getNextToken(fp);
   if(currentToken != '(') LOG_ERROR("expected '(' in prototype");
 
   while(getNextToken(fp) == identifier) {
-    p->args[p->argLen] = identifierStr;
+    strcpy(p->args[p->argLen], identifierStr);
     p->argLen++;
   }
 
@@ -168,6 +170,7 @@ void handleTPE(FILE* fp) {
   void* x = parseTopLevelExpr(fp);
   if(x) {
     fprintf(stderr, "top\n");
+    free(((FuncAST*)x)->prot);
     free(x);
   } else {
     getNextToken(fp);
@@ -175,9 +178,11 @@ void handleTPE(FILE* fp) {
 }
 
 void handleDef(FILE* fp) {
-  void* x= parseDefinition(fp);
+  void* x = parseDefinition(fp);
   if(x) {
     fprintf(stderr, "function\n");
+    free(((FuncAST*)x)->prot->args);
+    free(((FuncAST*)x)->prot);
     free(x);
   } else {
     getNextToken(fp);

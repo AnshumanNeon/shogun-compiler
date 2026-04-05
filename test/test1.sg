@@ -1,3 +1,1 @@
-fn main() -> int {
-   return;
-}
+var hello = 1;
