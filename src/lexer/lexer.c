@@ -51,36 +51,6 @@ void nextWord(char* lastChar, FILE* fp) {
   }
 }
 
-enum Token checkIdentifier(char* lastChar, FILE* fp) {
-  if(isalpha(*lastChar)) {
-    identifierStr[identifierLen] = *lastChar;
-    identifierLen++;
-
-    while(isalpha(*lastChar = fgetc(fp))) {
-      identifierStr[identifierLen] = *lastChar;
-      identifierLen++;
-    }
-
-    if(0 == strcmp(identifierStr, "var") || (0 == strcmp(identifierStr, "const"))) {
-      nextWord(lastChar, fp);
-
-      if(isNum()) {
-	nextWord(lastChar, fp);
-      }
-    }
-    
-    if(0 == strcmp(identifierStr, "fn")) {
-      identifierLen = 0;
-      strcpy(identifierStr, " ");
-      return fn;
-    }
-
-    return matchToken();
-  }
-
-  return invalid;
-}
-
 enum Token checkNumbers(char* lastChar, FILE* fp) {
   // check for numbers
   // TODO: handle errors such as 127.3.1.0
@@ -97,6 +67,44 @@ enum Token checkNumbers(char* lastChar, FILE* fp) {
     numberVal = strtold(num, 0);
     free(num);
     return number;
+  }
+
+  return invalid;
+}
+
+enum Token checkIdentifier(char* lastChar, FILE* fp) {
+  if(isalpha(*lastChar)) {
+    identifierStr[identifierLen] = *lastChar;
+    identifierLen++;
+
+    while(isalpha(*lastChar = fgetc(fp))) {
+      identifierStr[identifierLen] = *lastChar;
+      identifierLen++;
+    }
+
+    if(0 == strcmp(identifierStr, "var") || (0 == strcmp(identifierStr, "const"))) {
+      nextWord(lastChar, fp);
+
+      if(isNum()) {
+	nextWord(lastChar, fp);
+	nextWord(lastChar, fp);
+
+	if(0 != strcmp(identifierStr, "=")) {
+	  return invalid;
+	}
+	
+	nextWord(lastChar, fp);
+	checkNumbers(lastChar, fp);
+      }
+    }
+    
+    if(0 == strcmp(identifierStr, "fn")) {
+      identifierLen = 0;
+      strcpy(identifierStr, " ");
+      return fn;
+    }
+
+    return matchToken();
   }
 
   return invalid;
