@@ -40,9 +40,7 @@ void nextWord(char* lastChar, FILE* fp) {
   identifierLen = 0;
   strcpy(identifierStr, " ");
 
-  while(isspace(*lastChar = fgetc(fp))) {
-    //
-  }
+  while(isspace(*lastChar = fgetc(fp)));
       
   identifierStr[identifierLen] = *lastChar;
   identifierLen++;
@@ -53,28 +51,21 @@ void nextWord(char* lastChar, FILE* fp) {
   }
 }
 
-enum Token getToken(FILE* fp) {
-  char lastChar = ' ';
-
-  while(isspace(lastChar)) {
-    lastChar = fgetc(fp);
-  }
-
-  if(isalpha(lastChar)) {
-    identifierStr[identifierLen] = lastChar;
+enum Token checkIdentifier(char* lastChar, FILE* fp) {
+  if(isalpha(*lastChar)) {
+    identifierStr[identifierLen] = *lastChar;
     identifierLen++;
 
-    while(isalpha(lastChar = fgetc(fp))) {
-      identifierStr[identifierLen] = lastChar;
+    while(isalpha(*lastChar = fgetc(fp))) {
+      identifierStr[identifierLen] = *lastChar;
       identifierLen++;
     }
 
     if(0 == strcmp(identifierStr, "var") || (0 == strcmp(identifierStr, "const"))) {
-      nextWord(&lastChar, fp);
+      nextWord(lastChar, fp);
 
       if(isNum()) {
-	nextWord(&lastChar, fp);
-	printf("%s", identifierStr);
+	nextWord(lastChar, fp);
       }
     }
     
@@ -87,37 +78,66 @@ enum Token getToken(FILE* fp) {
     return matchToken();
   }
 
+  return invalid;
+}
+
+enum Token checkNumbers(char* lastChar, FILE* fp) {
   // check for numbers
   // TODO: handle errors such as 127.3.1.0
-  if(isdigit(lastChar) || lastChar == '.') {
+  if(isdigit(*lastChar) || *lastChar == '.') {
     char* num = (char*)malloc(128);
     int n = 0;
 
     do {
-      num[n] = lastChar;
+      num[n] = *lastChar;
       n++;
-      lastChar = fgetc(fp);
-    } while(isdigit(lastChar) || lastChar == '.');
+      *lastChar = fgetc(fp);
+    } while(isdigit(*lastChar) || *lastChar == '.');
 
     numberVal = strtold(num, 0);
     free(num);
     return number;
   }
 
-  // check for comments
-  if(lastChar == '/') {
-    lastChar = fgetc(fp);
+  return invalid;
+}
 
-    if(lastChar == '/') {
+enum Token checkComments(char* lastChar, FILE* fp) {
+  // check for comments
+  if(*lastChar == '/') {
+    *lastChar = fgetc(fp);
+
+    if(*lastChar == '/') {
       // comment until EOF
       do {
-	lastChar = fgetc(fp);
-      } while(lastChar != EOF && lastChar != '\n' && lastChar != '\r');
+	*lastChar = fgetc(fp);
+      } while(*lastChar != EOF && *lastChar != '\n' && *lastChar != '\r');
 
-      if(lastChar != EOF) return getToken(fp);
+      if(*lastChar != EOF) return getToken(fp);
     }
   }
 
+  return invalid;
+}
+
+enum Token getToken(FILE* fp) {
+  char lastChar = ' ';
+
+  while(isspace(lastChar)) {
+    lastChar = fgetc(fp);
+  }
+
+  int ret = invalid;
+
+  ret = checkIdentifier(&lastChar, fp);
+  if(ret != invalid) return ret;
+
+  ret = checkNumbers(&lastChar, fp);
+  if(ret != invalid) return ret;
+
+  ret = checkComments(&lastChar, fp);
+  if(ret != invalid) return ret;
+  
   if(lastChar == EOF) {
     return eof;
   }

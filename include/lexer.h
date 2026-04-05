@@ -2,7 +2,9 @@
 
 enum Token {
   eof, identifier, number, keyword,
-  fn
+  fn,
+
+  invalid
 };
 
 char identifierStr[44];
