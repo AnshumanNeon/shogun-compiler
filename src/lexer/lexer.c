@@ -49,6 +49,8 @@ void nextWord(FILE* fp) {
     identifierStr[identifierLen] = lastChar;
     identifierLen++;
   }
+
+  identifierStr[identifierLen] = '\0';
 }
 
 enum Token checkNumbers(FILE* fp) {

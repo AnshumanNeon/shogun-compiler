@@ -1,2 +1,2 @@
-fn main(int x, float y) {
+fn main(int8 x, float128 y) -> int {
 }
