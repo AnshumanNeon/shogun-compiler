@@ -79,7 +79,6 @@ void* parse(FILE* fp) {
   }
 
   LOG_ERROR("unknown token");
-  printf("%s\n", identifierStr);
   return NULL;
 }
 
@@ -121,24 +120,26 @@ void parseArgs(ProtAST* p, FILE* fp) {
 
   if(0 != strcmp(identifierStr, " ")) {
     LOG_ERROR(identifierStr);
+    strcpy(p->type[p->argLen], identifierStr);
+  }
+
+  nextWord(fp);  
+
+  if(0 != strcmp(identifierStr, " ")) {
+    LOG_ERROR(identifierStr);
     strcpy(p->args[p->argLen], identifierStr);
     p->argLen++;
   }
-
-  getNextToken(fp);
 }
 
 void* parsePrototype(FILE* fp) {
   if(currentToken != identifier) LOG_ERROR("expected function name in prototype");
 
   ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
-  /* p->args = (char*)malloc(sizeof(char*)*128); */
   p->argLen = 0;
   strcpy(p->name, identifierStr);
 
   if(lastChar != '(') LOG_ERROR("expected '(' in prototype");
-
-  /* getNextToken(fp); */
 
   while(lastChar != ')') {
     parseArgs(p, fp);
