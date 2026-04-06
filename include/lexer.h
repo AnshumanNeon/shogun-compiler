@@ -8,7 +8,9 @@ enum Token {
 };
 
 char identifierStr[44];
+char lastChar;
 int identifierLen;
 long double numberVal;
 
 enum Token getToken(FILE* fp);
+void nextWord(FILE* fp);

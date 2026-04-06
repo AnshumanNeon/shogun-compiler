@@ -23,8 +23,8 @@ typedef struct CALL_EXPR_AST {
 } CallExprAST;
 
 typedef struct PROTOTYPE_AST {
-  char* name;
-  char** args; // list of arguments, each arg is a char* string
+  char name[44];
+  char args[128][44]; // list of arguments, each arg is a char* string
   unsigned int argLen;
 } ProtAST;
 

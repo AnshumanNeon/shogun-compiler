@@ -79,6 +79,7 @@ void* parse(FILE* fp) {
   }
 
   LOG_ERROR("unknown token");
+  printf("%s\n", identifierStr);
   return NULL;
 }
 
@@ -115,23 +116,35 @@ void* parseBinOpsRHS(FILE* fp, int exprPrecedence, void* lhs) {
   }
 }
 
-void* parsePrototype(FILE* fp) {
-  if(currentToken != identifier) LOG_ERROR("expected function name in prototype");
+void parseArgs(ProtAST* p, FILE* fp) {
+  nextWord(fp);
 
-  ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
-  p->args = (char**)malloc(sizeof(char*)*128);
-  p->name = identifierStr;
-
-  getNextToken(fp);
-
-  if(currentToken != '(') LOG_ERROR("expected '(' in prototype");
-
-  while(getNextToken(fp) == identifier) {
+  if(0 != strcmp(identifierStr, " ")) {
+    LOG_ERROR(identifierStr);
     strcpy(p->args[p->argLen], identifierStr);
     p->argLen++;
   }
 
-  if(currentToken != ')') LOG_ERROR("expected ')' in prototype");
+  getNextToken(fp);
+}
+
+void* parsePrototype(FILE* fp) {
+  if(currentToken != identifier) LOG_ERROR("expected function name in prototype");
+
+  ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
+  /* p->args = (char*)malloc(sizeof(char*)*128); */
+  p->argLen = 0;
+  strcpy(p->name, identifierStr);
+
+  if(lastChar != '(') LOG_ERROR("expected '(' in prototype");
+
+  /* getNextToken(fp); */
+
+  while(lastChar != ')') {
+    parseArgs(p, fp);
+  }
+
+  if(lastChar != ')') LOG_ERROR("expected ')' in prototype");
   getNextToken(fp);
 
   return (void*)p;
@@ -157,7 +170,7 @@ void* parseTopLevelExpr(FILE* fp) {
   void* e = parseExpr(fp);
   if(e) {
     ProtAST* p = (ProtAST*)malloc(sizeof(ProtAST));
-    p->name = "__anon_expr";
+    strcpy(p->name, "__anon_expr");
     FuncAST* f = (FuncAST*)malloc(sizeof(FuncAST));
     f->prot = (ProtAST*)p;
     f->body = e;
@@ -179,12 +192,12 @@ void handleTPE(FILE* fp) {
 }
 
 void handleDef(FILE* fp) {
-  void* x = parseDefinition(fp);
-  if(x) {
+  void* f = parseDefinition(fp);
+  if(f) {
     fprintf(stderr, "function\n");
-    free(((FuncAST*)x)->prot->args);
-    free(((FuncAST*)x)->prot);
-    free(x);
+    /* free(((FuncAST*)f)->prot->args); */
+    free(((FuncAST*)f)->prot);
+    free(f);
   } else {
     getNextToken(fp);
   }
@@ -192,6 +205,7 @@ void handleDef(FILE* fp) {
 
 // just for testing
 void loop(FILE* fp) {
+  /* identifierStr = (struct ARG*)malloc(sizeof()*128); */
   getNextToken(fp);
 
   while(1) {
@@ -210,4 +224,6 @@ void loop(FILE* fp) {
     }
     }
   }
+
+  /* free(identifierStr); */
 }

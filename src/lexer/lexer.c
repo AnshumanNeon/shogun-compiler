@@ -36,33 +36,33 @@ int isNum() {
   return 0;
 }
 
-void nextWord(char* lastChar, FILE* fp) {
+void nextWord(FILE* fp) {
   identifierLen = 0;
   strcpy(identifierStr, " ");
 
-  while(isspace(*lastChar = fgetc(fp)));
+  while(isspace(lastChar = fgetc(fp)));
       
-  identifierStr[identifierLen] = *lastChar;
+  identifierStr[identifierLen] = lastChar;
   identifierLen++;
 
-  while(isalnum(*lastChar = fgetc(fp))) {
-    identifierStr[identifierLen] = *lastChar;
+  while(isalnum(lastChar = fgetc(fp))) {
+    identifierStr[identifierLen] = lastChar;
     identifierLen++;
   }
 }
 
-enum Token checkNumbers(char* lastChar, FILE* fp) {
+enum Token checkNumbers(FILE* fp) {
   // check for numbers
   // TODO: handle errors such as 127.3.1.0
-  if(isdigit(*lastChar) || *lastChar == '.') {
+  if(isdigit(lastChar) || lastChar == '.') {
     char* num = (char*)malloc(128);
     int n = 0;
 
     do {
-      num[n] = *lastChar;
+      num[n] = lastChar;
       n++;
-      *lastChar = fgetc(fp);
-    } while(isdigit(*lastChar) || *lastChar == '.');
+      lastChar = fgetc(fp);
+    } while(isdigit(lastChar) || lastChar == '.');
 
     numberVal = strtold(num, 0);
     free(num);
@@ -72,29 +72,29 @@ enum Token checkNumbers(char* lastChar, FILE* fp) {
   return invalid;
 }
 
-enum Token checkIdentifier(char* lastChar, FILE* fp) {
-  if(isalpha(*lastChar)) {
-    identifierStr[identifierLen] = *lastChar;
+enum Token checkIdentifier(FILE* fp) {
+  if(isalpha(lastChar)) {
+    identifierStr[identifierLen] = lastChar;
     identifierLen++;
 
-    while(isalpha(*lastChar = fgetc(fp))) {
-      identifierStr[identifierLen] = *lastChar;
+    while(isalpha(lastChar = fgetc(fp))) {
+      identifierStr[identifierLen] = lastChar;
       identifierLen++;
     }
 
     if(0 == strcmp(identifierStr, "var") || (0 == strcmp(identifierStr, "const"))) {
-      nextWord(lastChar, fp);
+      nextWord(fp);
 
       if(isNum()) {
-	nextWord(lastChar, fp);
-	nextWord(lastChar, fp);
+	nextWord(fp);
+	nextWord(fp);
 
 	if(0 != strcmp(identifierStr, "=")) {
 	  return invalid;
 	}
 	
-	nextWord(lastChar, fp);
-	checkNumbers(lastChar, fp);
+	nextWord(fp);
+	checkNumbers(fp);
       }
     }
     
@@ -110,26 +110,32 @@ enum Token checkIdentifier(char* lastChar, FILE* fp) {
   return invalid;
 }
 
-enum Token checkComments(char* lastChar, FILE* fp) {
+enum Token checkComments(FILE* fp) {
   // check for comments
-  if(*lastChar == '/') {
-    *lastChar = fgetc(fp);
+  if(lastChar == '/') {
+    lastChar = fgetc(fp);
 
-    if(*lastChar == '/') {
+    if(lastChar == '/') {
       // comment until EOF
       do {
-	*lastChar = fgetc(fp);
-      } while(*lastChar != EOF && *lastChar != '\n' && *lastChar != '\r');
+	lastChar = fgetc(fp);
+      } while(lastChar != EOF && lastChar != '\n' && lastChar != '\r');
 
-      if(*lastChar != EOF) return getToken(fp);
+      if(lastChar != EOF) return getToken(fp);
     }
   }
 
   return invalid;
 }
 
+enum Token checkParens(FILE* fp) {
+  if(lastChar == '(') return '(';
+  if(lastChar == ')') return ')';
+  return invalid;
+}
+
 enum Token getToken(FILE* fp) {
-  char lastChar = ' ';
+  lastChar = ' ';
 
   while(isspace(lastChar)) {
     lastChar = fgetc(fp);
@@ -137,20 +143,23 @@ enum Token getToken(FILE* fp) {
 
   int ret = invalid;
 
-  ret = checkIdentifier(&lastChar, fp);
+  ret = checkParens(fp);
+  if(ret != invalid) return ret;
+  
+  ret = checkIdentifier(fp);
   if(ret != invalid) return ret;
 
-  ret = checkNumbers(&lastChar, fp);
+  ret = checkNumbers(fp);
   if(ret != invalid) return ret;
 
-  ret = checkComments(&lastChar, fp);
+  ret = checkComments(fp);
   if(ret != invalid) return ret;
   
   if(lastChar == EOF) {
     return eof;
   }
 
-  char thisChar = lastChar;
-  lastChar = fgetc(fp);
+  char thisChar = ret;
+  ret = lastChar;
   return thisChar;
 }
