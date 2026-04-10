@@ -26,6 +26,7 @@ typedef struct PROTOTYPE_AST {
   char name[44];
   char args[128][44]; // list of arguments
   char type[128][44]; // list of type of each argument
+  char ret[44]; // return type
   unsigned int argLen;
 } ProtAST;
 

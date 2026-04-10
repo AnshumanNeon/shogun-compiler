@@ -76,9 +76,9 @@ void* parse(FILE* fp) {
   case identifier: return parseIdentifierExpr(fp);
   case number: return parseNumExpr(fp);
   case '(': return parseParenExpr(fp);
+  default: LOG_ERROR("unknown token");
   }
 
-  LOG_ERROR("unknown token");
   return NULL;
 }
 
@@ -119,14 +119,12 @@ void parseArgs(ProtAST* p, FILE* fp) {
   nextWord(fp);
 
   if(0 != strcmp(identifierStr, " ")) {
-    LOG_ERROR(identifierStr);
     strcpy(p->type[p->argLen], identifierStr);
   }
 
   nextWord(fp);  
 
   if(0 != strcmp(identifierStr, " ")) {
-    LOG_ERROR(identifierStr);
     strcpy(p->args[p->argLen], identifierStr);
     p->argLen++;
   }
@@ -146,6 +144,15 @@ void* parsePrototype(FILE* fp) {
   }
 
   if(lastChar != ')') LOG_ERROR("expected ')' in prototype");
+  getNextToken(fp);
+
+  // return type
+  nextWhatever(fp);
+
+  if(0 != strcmp(identifierStr, "->")) LOG_ERROR("dasdas");
+  nextWord(fp);
+  strcpy(p->ret, identifierStr);
+
   getNextToken(fp);
 
   return (void*)p;

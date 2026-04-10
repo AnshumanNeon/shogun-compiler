@@ -36,6 +36,26 @@ int isNum() {
   return 0;
 }
 
+void nextWhatever(FILE* fp) {
+  identifierLen = 0;
+  strcpy(identifierStr, " ");
+
+  while(isspace(lastChar = fgetc(fp)));
+
+  fseek(fp, -2, SEEK_CUR);
+  lastChar = fgetc(fp);
+      
+  identifierStr[identifierLen] = lastChar;
+  identifierLen++;
+
+  while(!isspace(lastChar = fgetc(fp))) {
+    identifierStr[identifierLen] = lastChar;
+    identifierLen++;
+  }
+
+  identifierStr[identifierLen] = '\0';
+}
+
 void nextWord(FILE* fp) {
   identifierLen = 0;
   strcpy(identifierStr, " ");

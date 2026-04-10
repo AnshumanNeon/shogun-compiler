@@ -14,3 +14,4 @@ long double numberVal;
 
 enum Token getToken(FILE* fp);
 void nextWord(FILE* fp);
+void nextWhatever(FILE* fp);
